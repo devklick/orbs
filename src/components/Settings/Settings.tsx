@@ -26,9 +26,15 @@ function Settings() {
   return (
     <div className={clsx("settings", `settings--${theme}`)}>
       <div className="settings__icon">
-        {!open && <IconSettings onClick={onModalIconClicked} size={"100%"} />}
+        {!open && (
+          <IconSettings onClick={onModalIconClicked} size={"100%"} stroke={1} />
+        )}
         {open && (
-          <IconSettingsFilled onClick={onModalIconClicked} size={"100%"} />
+          <IconSettingsFilled
+            onClick={onModalIconClicked}
+            size={"100%"}
+            stroke={1}
+          />
         )}
       </div>
       {open && (

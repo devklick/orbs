@@ -156,7 +156,7 @@ const useSettingsStore = create<SettingsState>((set, get) => ({
     if (hValid && sValid && lValid) {
       set({ backgroundColor });
     }
-    const uiColorTheme: ColorTheme = backgroundColor.l > 70 ? "light" : "dark";
+    const uiColorTheme: ColorTheme = backgroundColor.l > 60 ? "light" : "dark";
     set({ uiColorTheme });
   },
   setUIColorTheme(uiColorTheme) {
