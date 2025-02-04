@@ -1,3 +1,8 @@
+export interface HSLColor {
+  h: number;
+  s: number;
+  l: number;
+}
 export interface HSLColorRange {
   h: [min: number, max: number];
   s: [min: number, max: number];

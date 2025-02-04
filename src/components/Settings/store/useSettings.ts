@@ -1,10 +1,14 @@
 import { create } from "zustand";
+
 import {
   clone,
   DeepReadonly,
+  HSLColor,
   HSLColorRange,
   NumberRange,
 } from "../../../types";
+
+type ColorTheme = "light" | "dark";
 
 interface SettingsStateProperties {
   /**
@@ -42,21 +46,26 @@ interface SettingsStateProperties {
    * @default 1
    */
   xySpeed: number;
+  /**
+   * Controls the color of the canvas that the orbs are drawn to.
+   */
+  backgroundColor: HSLColor;
+  uiColorTheme: ColorTheme;
 }
 
-type DefaultState = DeepReadonly<
+type Defaults = DeepReadonly<
   SettingsStateProperties & {
-    orbColorRangeMinMax: { h: NumberRange; s: NumberRange; l: NumberRange };
+    hslMinMax: { h: NumberRange; s: NumberRange; l: NumberRange };
     orbDensityFactorRange: NumberRange;
     maxOrbSizeRange: NumberRange;
     xySpeedRange: NumberRange;
   }
 >;
 
-const defaults: DefaultState = {
+const defaults: Defaults = {
   modalOpen: false,
   orbColorRange: { h: [140, 220], s: [20, 40], l: [40, 80] },
-  orbColorRangeMinMax: {
+  hslMinMax: {
     h: { min: 0, max: 360 },
     s: { min: 0, max: 100 },
     l: { min: 0, max: 100 },
@@ -67,10 +76,12 @@ const defaults: DefaultState = {
   maxOrbSizeRange: { min: 1, max: 3 },
   xySpeed: 1,
   xySpeedRange: { min: 1, max: 10 },
+  backgroundColor: { h: 233, s: 11, l: 18 },
+  uiColorTheme: "dark",
 };
 
 interface SettingsState extends SettingsStateProperties {
-  defaults: DefaultState;
+  defaults: Defaults;
   currentFPS: Readonly<number>;
   setModalOpen(modalOpen: boolean): void;
   setOrbColorRange(orbColorRange: HSLColorRange): void;
@@ -78,16 +89,20 @@ interface SettingsState extends SettingsStateProperties {
   setMaxOrbSize(maxOrbSize: number): void;
   setXYSpeed(speed: number): void;
   setCurrentFPS(currentFPS: number): void;
+  setBackgroundColor(backgroundColor: HSLColor): void;
+  setUIColorTheme(uiColorTheme: ColorTheme): void;
 }
 
 const useSettingsStore = create<SettingsState>((set, get) => ({
   defaults: defaults,
+  backgroundColor: defaults.backgroundColor,
   currentFPS: 0,
   modalOpen: defaults.modalOpen,
   orbColorRange: clone(defaults.orbColorRange, { writable: true }),
   orbDensityFactor: defaults.orbDensityFactor,
   maxOrbSize: defaults.maxOrbSize,
   xySpeed: defaults.xySpeed,
+  uiColorTheme: defaults.uiColorTheme,
   setModalOpen(modalOpen) {
     set({ modalOpen });
   },
@@ -95,7 +110,7 @@ const useSettingsStore = create<SettingsState>((set, get) => ({
     set({ maxOrbSize });
   },
   setOrbColorRange(orbColorRange) {
-    const defaults = get().defaults.orbColorRangeMinMax;
+    const defaults = get().defaults.hslMinMax;
     const hValid =
       orbColorRange.h[0] >= defaults.h.min &&
       orbColorRange.h[1] <= defaults.h.max &&
@@ -108,7 +123,7 @@ const useSettingsStore = create<SettingsState>((set, get) => ({
 
     const lValid =
       orbColorRange.l[0] >= defaults.l.min &&
-      orbColorRange.l[1] <= defaults.s.max &&
+      orbColorRange.l[1] <= defaults.l.max &&
       orbColorRange.l[0] <= orbColorRange.l[1];
 
     if (hValid && sValid && lValid) {
@@ -123,6 +138,29 @@ const useSettingsStore = create<SettingsState>((set, get) => ({
   },
   setCurrentFPS(currentFPS) {
     set({ currentFPS });
+  },
+  setBackgroundColor(backgroundColor) {
+    const defaults = get().defaults.hslMinMax;
+    const hValid =
+      backgroundColor.h >= defaults.h.min &&
+      backgroundColor.h <= defaults.h.max;
+
+    const sValid =
+      backgroundColor.s >= defaults.s.min &&
+      backgroundColor.s <= defaults.s.max;
+
+    const lValid =
+      backgroundColor.l >= defaults.l.min &&
+      backgroundColor.l <= defaults.s.max;
+
+    if (hValid && sValid && lValid) {
+      set({ backgroundColor });
+    }
+    const uiColorTheme: ColorTheme = backgroundColor.l > 70 ? "light" : "dark";
+    set({ uiColorTheme });
+  },
+  setUIColorTheme(uiColorTheme) {
+    set({ uiColorTheme });
   },
 }));
 

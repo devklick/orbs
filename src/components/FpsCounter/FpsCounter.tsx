@@ -11,7 +11,7 @@ function FpsCounter() {
       ref.current.innerText = `FPS: ${Math.floor(fps)}`;
     }
   }, [fps]);
-  return <span ref={ref} className="fps-counter" />;
+  return <span ref={ref} className={"fps-counter"} />;
 }
 
 export default FpsCounter;

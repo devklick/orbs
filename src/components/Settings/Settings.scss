@@ -1,4 +1,15 @@
+@use "/src/globals" as *;
+
 .settings {
+    &--light {
+        border: 1px solid $font-color-light;
+
+        .settings__modal,
+        .settings__group {
+            border: 1px solid $font-color-light;
+        }
+    }
+
     &__icon {
         position: absolute;
         top: 5px;
@@ -12,7 +23,8 @@
         top: 60px;
         right: 5px;
         padding: 18px;
-        background-color: rgb(70, 70, 70);
+
+        border: 1px solid $font-color-dark;
     }
 
     &__setting {
@@ -24,5 +36,13 @@
 
     &__group {
         margin-top: 20px;
+        display: flex;
+        flex-direction: column;
+        border: 1px solid $font-color-dark;
+        padding: 8px;
+
+        & > label {
+            text-align: center;
+        }
     }
 }
