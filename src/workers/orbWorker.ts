@@ -1,6 +1,8 @@
 import { createOrbs, drawOrb, FPMS, updateOrb } from "../orbs/orbs.types";
 import { HSLColorRange } from "../types";
 
+const FPS_UPDATE_INTERVAL = 200;
+
 interface MessageData {
   canvas: OffscreenCanvas;
   maxOrbSize: number;
@@ -11,6 +13,7 @@ interface MessageData {
 }
 
 let animationFrameId: number;
+let canvas: OffscreenCanvas;
 
 self.onmessageerror = (e) => {
   console.log("Worker received message error");
@@ -20,9 +23,19 @@ self.onmessage = (event: MessageEvent<MessageData>) => {
   console.log("Worker received message");
   self.postMessage({ type: "log", message: JSON.stringify(event.data) });
 
-  const { type, canvas, maxOrbSize, orbColorRange, orbDensity, xySpeed } =
-    event.data;
+  const {
+    type,
+    canvas: _canvas,
+    maxOrbSize,
+    orbColorRange,
+    orbDensity,
+    xySpeed,
+  } = event.data;
+  if (type === "STOP" && animationFrameId)
+    cancelAnimationFrame(animationFrameId);
   if (type !== "orb") return;
+
+  if (_canvas) canvas = _canvas;
 
   const ctx = canvas.getContext("2d");
   if (!ctx) return;
@@ -36,17 +49,17 @@ self.onmessage = (event: MessageEvent<MessageData>) => {
   });
 
   let prevTime = performance.now();
-  // let lastFpsUpdate = 0;
+  let lastFpsUpdate = 0;
 
   const draw = (time: number) => {
     const deltaTime = time - prevTime;
-    // const fps = 1000 / deltaTime;
+    const fps = 1000 / deltaTime;
     prevTime = time;
 
-    // if (time - lastFpsUpdate > FPS_UPDATE_INTERVAL) {
-    //   setCurrentFPS(fps);
-    //   lastFpsUpdate = time;
-    // }
+    if (time - lastFpsUpdate > FPS_UPDATE_INTERVAL) {
+      self.postMessage({ type: "FPS", fps });
+      lastFpsUpdate = time;
+    }
 
     ctx.clearRect(0, 0, canvas.width, canvas.height);
 
