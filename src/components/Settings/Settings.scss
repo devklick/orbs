@@ -2,8 +2,6 @@
 
 .settings {
     &--light {
-        border: 1px solid $font-color-light;
-
         .settings__modal,
         .settings__group {
             border: 1px solid $font-color-light;
