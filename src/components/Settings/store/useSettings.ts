@@ -93,7 +93,7 @@ interface SettingsState extends SettingsStateProperties {
   setUIColorTheme(uiColorTheme: ColorTheme): void;
 }
 
-const useSettingsStore = create<SettingsState>((set, get) => ({
+const useSettings = create<SettingsState>((set, get) => ({
   defaults: defaults,
   backgroundColor: defaults.backgroundColor,
   currentFPS: 0,
@@ -164,4 +164,4 @@ const useSettingsStore = create<SettingsState>((set, get) => ({
   },
 }));
 
-export default useSettingsStore;
+export default useSettings;

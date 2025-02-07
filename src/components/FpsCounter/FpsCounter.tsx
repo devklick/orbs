@@ -1,9 +1,9 @@
 import { useEffect, useRef } from "react";
-import useSettingsStore from "../Settings/store/useSettings";
+import { useSettings } from "../Settings";
 import "./FpsCounter.scss";
 
 function FpsCounter() {
-  const fps = useSettingsStore((s) => s.currentFPS);
+  const fps = useSettings((s) => s.currentFPS);
   const ref = useRef<HTMLSpanElement>(null);
 
   useEffect(() => {
