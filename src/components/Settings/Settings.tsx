@@ -1,21 +1,22 @@
+import clsx from "clsx";
 import { IconSettings, IconSettingsFilled } from "@tabler/icons-react";
 
-import useSettingsStore from "./store/useSettings";
+import useSettings from "./store/useSettings";
 import "./Settings.scss";
-import clsx from "clsx";
 
 function Settings() {
-  const open = useSettingsStore((s) => s.modalOpen);
-  const setModalOpen = useSettingsStore((s) => s.setModalOpen);
-  const setOrbDensity = useSettingsStore((s) => s.setOrbDensityFactor);
-  const setMaxOrbSize = useSettingsStore((s) => s.setMaxOrbSize);
-  const setOrbColorRange = useSettingsStore((s) => s.setOrbColorRange);
-  const setSpeed = useSettingsStore((s) => s.setXYSpeed);
-  const orbColorRange = useSettingsStore((s) => s.orbColorRange);
-  const backgroundColor = useSettingsStore((s) => s.backgroundColor);
-  const theme = useSettingsStore((s) => s.uiColorTheme);
-  const setBackgroundColor = useSettingsStore((s) => s.setBackgroundColor);
-  const defaults = useSettingsStore((s) => s.defaults);
+  const open = useSettings((s) => s.modalOpen);
+  const setModalOpen = useSettings((s) => s.setModalOpen);
+  const setOrbDensity = useSettings((s) => s.setOrbDensityFactor);
+  const setMaxOrbSize = useSettings((s) => s.setMaxOrbSize);
+  const setOrbColorRange = useSettings((s) => s.setOrbColorRange);
+  const setSpeed = useSettings((s) => s.setXYSpeed);
+  const setZDepth = useSettings((s) => s.setZDepth);
+  const orbColorRange = useSettings((s) => s.orbColorRange);
+  const backgroundColor = useSettings((s) => s.backgroundColor);
+  const theme = useSettings((s) => s.uiColorTheme);
+  const setBackgroundColor = useSettings((s) => s.setBackgroundColor);
+  const defaults = useSettings((s) => s.defaults);
 
   const modalColor = `hsl(${backgroundColor.h} ${backgroundColor.s} ${backgroundColor.l})`;
 
@@ -72,6 +73,18 @@ function Settings() {
               step={0.1}
               defaultValue={defaults.xySpeed}
               onChange={(e) => setSpeed(Number(e.target.value))}
+            />
+          </div>
+
+          <div className="settings__setting">
+            <label>Depth</label>
+            <input
+              type="range"
+              min={defaults.zDepthRange.min}
+              max={defaults.zDepthRange.max}
+              step={0.1}
+              defaultValue={defaults.zDepth}
+              onChange={(e) => setZDepth(Number(e.target.value))}
             />
           </div>
 

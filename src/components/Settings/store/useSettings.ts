@@ -46,6 +46,15 @@ interface SettingsStateProperties {
    * @default 1
    */
   xySpeed: number;
+
+  /**
+   * Controls the depth that the orb is allowed to travel along the Z axis.
+   *
+   * - Min: 0
+   * - Max: 3
+   * @default 1
+   */
+  zDepth: number;
   /**
    * Controls the color of the canvas that the orbs are drawn to.
    */
@@ -59,6 +68,7 @@ type Defaults = DeepReadonly<
     orbDensityFactorRange: NumberRange;
     maxOrbSizeRange: NumberRange;
     xySpeedRange: NumberRange;
+    zDepthRange: NumberRange;
   }
 >;
 
@@ -77,6 +87,8 @@ const defaults: Defaults = {
   xySpeed: 1,
   xySpeedRange: { min: 1, max: 10 },
   backgroundColor: { h: 233, s: 11, l: 18 },
+  zDepth: 1,
+  zDepthRange: { min: 0, max: 3 },
   uiColorTheme: "dark",
 };
 
@@ -91,9 +103,10 @@ interface SettingsState extends SettingsStateProperties {
   setCurrentFPS(currentFPS: number): void;
   setBackgroundColor(backgroundColor: HSLColor): void;
   setUIColorTheme(uiColorTheme: ColorTheme): void;
+  setZDepth(zDepth: number): void;
 }
 
-const useSettingsStore = create<SettingsState>((set, get) => ({
+const useSettings = create<SettingsState>((set, get) => ({
   defaults: defaults,
   backgroundColor: defaults.backgroundColor,
   currentFPS: 0,
@@ -103,6 +116,7 @@ const useSettingsStore = create<SettingsState>((set, get) => ({
   maxOrbSize: defaults.maxOrbSize,
   xySpeed: defaults.xySpeed,
   uiColorTheme: defaults.uiColorTheme,
+  zDepth: defaults.zDepth,
   setModalOpen(modalOpen) {
     set({ modalOpen });
   },
@@ -162,6 +176,12 @@ const useSettingsStore = create<SettingsState>((set, get) => ({
   setUIColorTheme(uiColorTheme) {
     set({ uiColorTheme });
   },
+  setZDepth(zDepth) {
+    const { min, max } = get().defaults.zDepthRange;
+    if (zDepth >= min && zDepth <= max) {
+      set({ zDepth });
+    }
+  },
 }));
 
-export default useSettingsStore;
+export default useSettings;
