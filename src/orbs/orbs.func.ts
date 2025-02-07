@@ -14,7 +14,8 @@ export function createOrb(
   canvasWidth: number,
   canvasHeight: number,
   orbColorRange: HSLColorRange,
-  maxOrbSize: number
+  maxOrbSize: number,
+  zDepth: number
 ): Orb {
   const orb: Orb = {
     position: {
@@ -23,12 +24,12 @@ export function createOrb(
       // Since z = 0 is the point where the camera is in focus,
       // and we want the orb to randomly positioned along the z axis,
       // we create a random float that's balanced around 0
-      z: random.balancedFloat(Z_RANGE),
+      z: random.balancedFloat(Z_RANGE) * zDepth,
     },
     velocity: {
       x: random.float(0, XY_SPEED_BASE_RANGE),
       y: random.float(0, XY_SPEED_BASE_RANGE),
-      z: random.float(0, Z_SPEED_BASE_RANGE),
+      z: random.float(0, Z_SPEED_BASE_RANGE) * zDepth,
     },
     phaseOffset: {
       x: random.float(0, 1000),
@@ -48,7 +49,8 @@ export function updateOrb(
   delta: number,
   xySpeed: number,
   canvasWidth: number,
-  canvasHeight: number
+  canvasHeight: number,
+  zDepth: number
 ) {
   const speedFactor = delta / FPMS; // Normalize to 60 FPS
 
@@ -67,7 +69,8 @@ export function updateOrb(
     Math.cos(time * 0.001 + orb.phaseOffset.z) *
     Z_SPEED_BASE_RANGE *
     speedFactor *
-    orb.zDirection;
+    orb.zDirection *
+    zDepth;
 
   // Move the orb
   orb.position.x += orb.velocity.x;
@@ -121,16 +124,18 @@ export function createOrbs({
   orbColorRange,
   orbDensity,
   maxOrbSize,
+  zDepth,
 }: {
   width: number;
   height: number;
   orbColorRange: HSLColorRange;
   orbDensity: number;
   maxOrbSize: number;
+  zDepth: number;
 }) {
   const area = width * height;
   const orbCount = Math.max(10, area / 20000) * orbDensity;
   return Array.from({ length: orbCount }, () =>
-    createOrb(width, height, orbColorRange, maxOrbSize)
+    createOrb(width, height, orbColorRange, maxOrbSize, zDepth)
   );
 }

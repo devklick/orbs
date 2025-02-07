@@ -15,6 +15,7 @@ export default function useOrbWorker(): UseOrbWorkerReturn {
   const orbColorRange = useSettings((s) => s.orbColorRange);
   const orbDensity = useSettings((s) => s.orbDensityFactor);
   const xySpeed = useSettings((s) => s.xySpeed);
+  const zDepth = useSettings((s) => s.zDepth);
   const [canvasRef, offscreenCanvasRef] = useOffscreenCanvas();
 
   /**
@@ -114,12 +115,14 @@ export default function useOrbWorker(): UseOrbWorkerReturn {
       orbColorRange,
       orbDensity,
       xySpeed,
+      zDepth,
     });
   }, [
     maxOrbSize,
     orbColorRange,
     orbDensity,
     xySpeed,
+    zDepth,
     sendUpdateMessage,
     sendStopMessage,
   ]);

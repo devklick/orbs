@@ -11,6 +11,7 @@ function Settings() {
   const setMaxOrbSize = useSettings((s) => s.setMaxOrbSize);
   const setOrbColorRange = useSettings((s) => s.setOrbColorRange);
   const setSpeed = useSettings((s) => s.setXYSpeed);
+  const setZDepth = useSettings((s) => s.setZDepth);
   const orbColorRange = useSettings((s) => s.orbColorRange);
   const backgroundColor = useSettings((s) => s.backgroundColor);
   const theme = useSettings((s) => s.uiColorTheme);
@@ -72,6 +73,18 @@ function Settings() {
               step={0.1}
               defaultValue={defaults.xySpeed}
               onChange={(e) => setSpeed(Number(e.target.value))}
+            />
+          </div>
+
+          <div className="settings__setting">
+            <label>Depth</label>
+            <input
+              type="range"
+              min={defaults.zDepthRange.min}
+              max={defaults.zDepthRange.max}
+              step={0.1}
+              defaultValue={defaults.zDepth}
+              onChange={(e) => setZDepth(Number(e.target.value))}
             />
           </div>
 

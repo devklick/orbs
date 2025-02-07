@@ -48,6 +48,7 @@ export namespace WorkerReceivedMessage {
     orbColorRange: HSLColorRange;
     orbDensity: number;
     xySpeed: number;
+    zDepth: number;
   }
 
   export interface Stop {
@@ -72,6 +73,7 @@ const FPS_UPDATE_INTERVAL = 500;
 interface DrawParams {
   xySpeed: number;
   ctx: OffscreenCanvasRenderingContext2D;
+  zDepth: number;
 }
 
 /**
@@ -172,7 +174,7 @@ function handleResumeMessage(data: WorkerReceivedMessage.Resume) {
   prevFrameTime = performance.now();
 
   animationFrameId = requestAnimationFrame((time) =>
-    draw(time, { xySpeed: data.xySpeed, ctx })
+    draw(time, { xySpeed: data.xySpeed, ctx, zDepth: data.zDepth })
   );
 }
 
@@ -186,6 +188,7 @@ function handleUpdateMessage({
   orbColorRange,
   orbDensity,
   xySpeed,
+  zDepth,
 }: WorkerReceivedMessage.Update) {
   const ctx = canvas?.getContext("2d");
   if (!ctx) return;
@@ -196,19 +199,20 @@ function handleUpdateMessage({
     maxOrbSize,
     orbColorRange,
     orbDensity,
+    zDepth,
   });
 
   prevFrameTime = performance.now();
 
   animationFrameId = requestAnimationFrame((time) =>
-    draw(time, { xySpeed, ctx })
+    draw(time, { xySpeed, ctx, zDepth })
   );
 }
 
 /**
  * Animation loop that takes care of applying physics to the orbs.
  */
-function draw(time: number, { xySpeed, ctx }: DrawParams) {
+function draw(time: number, { xySpeed, ctx, zDepth }: DrawParams) {
   const { deltaTime } = calcFrameTimes(time);
 
   ctx.clearRect(0, 0, canvas.width, canvas.height);
@@ -220,7 +224,8 @@ function draw(time: number, { xySpeed, ctx }: DrawParams) {
       deltaTime / FPMS,
       xySpeed,
       canvas.width,
-      canvas.height
+      canvas.height,
+      zDepth
     );
     drawOrb(orb, ctx);
     ctx.fill();
@@ -228,7 +233,7 @@ function draw(time: number, { xySpeed, ctx }: DrawParams) {
 
   if (paused) return;
   animationFrameId = requestAnimationFrame((time) =>
-    draw(time, { ctx, xySpeed })
+    draw(time, { ctx, xySpeed, zDepth })
   );
 }
 
