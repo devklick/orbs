@@ -3,26 +3,34 @@ import { HSLColorRange } from "../types";
 
 const FPS_UPDATE_INTERVAL = 200;
 
+export const MessageTypes = {
+  stop: "STOP",
+  update: "UPDATE",
+  fps: "FPS",
+} as const;
+
+type MessageType = (typeof MessageTypes)[keyof typeof MessageTypes];
+
 interface MessageData {
   canvas: OffscreenCanvas;
   maxOrbSize: number;
   orbColorRange: HSLColorRange;
   orbDensity: number;
   xySpeed: number;
-  type: string;
+  type: MessageType;
 }
 
 let animationFrameId: number;
+/**
+ * The canvas to use for rendering.
+ *
+ * This can only be transferred from the app to the worker once,
+ * and so we need to keep a reference to it. It is only expected to be provided
+ * on the first UPDATE message.
+ */
 let canvas: OffscreenCanvas;
 
-self.onmessageerror = (e) => {
-  console.log("Worker received message error");
-  self.postMessage({ type: "log", message: e.data });
-};
 self.onmessage = (event: MessageEvent<MessageData>) => {
-  console.log("Worker received message");
-  self.postMessage({ type: "log", message: JSON.stringify(event.data) });
-
   const {
     type,
     canvas: _canvas,
@@ -33,7 +41,7 @@ self.onmessage = (event: MessageEvent<MessageData>) => {
   } = event.data;
   if (type === "STOP" && animationFrameId)
     cancelAnimationFrame(animationFrameId);
-  if (type !== "orb") return;
+  if (type !== "UPDATE") return;
 
   if (_canvas) canvas = _canvas;
 
@@ -57,7 +65,7 @@ self.onmessage = (event: MessageEvent<MessageData>) => {
     prevTime = time;
 
     if (time - lastFpsUpdate > FPS_UPDATE_INTERVAL) {
-      self.postMessage({ type: "FPS", fps });
+      self.postMessage({ type: MessageTypes.fps, fps });
       lastFpsUpdate = time;
     }
 
@@ -81,18 +89,20 @@ self.onmessage = (event: MessageEvent<MessageData>) => {
 
   animationFrameId = requestAnimationFrame(draw);
 };
-// self.onmessage = (event) => {
-//   if (event.data === "STOP") {
-//     cancelAnimationFrame(animationFrameId);
-//   }
-// };
 
-// console.log("Setting up message handler in worker");
-// self.onmessage = (e) => {
-//   console.log("Worker received message");
-//   self.postMessage({ type: "log", message: JSON.stringify(e.data) });
-// };
-// self.onmessageerror = (e) => {
-//   console.log("Worker received message error");
-//   self.postMessage({ type: "log", message: JSON.stringify(e.data) });
-// };
+function handleMessage(data: MessageData) {
+  switch (data.type) {
+    case "STOP":
+      return handleStopMessage();
+    case "UPDATE":
+      return handleUpdateMessage(data);
+  }
+}
+
+function handleStopMessage() {
+  if (animationFrameId) {
+    cancelAnimationFrame(animationFrameId);
+  }
+}
+
+function handleUpdateMessage(data: MessageData) {}

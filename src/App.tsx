@@ -1,6 +1,6 @@
 import clsx from "clsx";
 
-import use2dCanvas from "./hooks/use2dCanvas";
+import { use2dCanvas } from "./hooks/canvasHooks";
 import useOrbs from "./hooks/useOrbs";
 
 import Settings from "./components/Settings";
@@ -19,7 +19,6 @@ function App() {
     <div className={clsx("app", `app--${theme}`)}>
       <FPS />
       <Settings />
-      {/* <canvas ref={canvasRef} style={{ background: `hsl(${h} ${s} ${l})` }} /> */}
       <Canvas />
     </div>
   );

@@ -1,6 +1,8 @@
 import { useEffect, useRef } from "react";
 import useSettingsStore from "../Settings/store/useSettings";
 import OrbWorker from "../../workers/orbWorker.ts?worker";
+import { MessageTypes } from "../../workers/orbWorker";
+import { useOffscreenCanvas } from "../../hooks/canvasHooks";
 
 function Canvas() {
   const { h, s, l } = useSettingsStore((s) => s.backgroundColor);
@@ -9,23 +11,22 @@ function Canvas() {
   const orbDensity = useSettingsStore((s) => s.orbDensityFactor);
   const xySpeed = useSettingsStore((s) => s.xySpeed);
   const setCurrentFPS = useSettingsStore((s) => s.setCurrentFPS);
-  const canvasRef = useRef<HTMLCanvasElement | null>(null);
-  const offscreenCanvas = useRef<OffscreenCanvas | null>(null);
+  const [canvasRef, offscreenCanvasRef] = useOffscreenCanvas();
   const workerRef = useRef<Worker | null>(null);
 
   useEffect(() => {
     const canvas = canvasRef.current;
     if (!canvas) return;
 
-    if (!offscreenCanvas.current) {
-      offscreenCanvas.current = canvas.transferControlToOffscreen();
+    if (!offscreenCanvasRef.current) {
+      offscreenCanvasRef.current = canvas.transferControlToOffscreen();
     }
 
     if (workerRef.current) return;
 
     workerRef.current = new OrbWorker();
     workerRef.current.onmessage = (e) => {
-      if (e.data.type === "FPS") {
+      if (e.data.type === MessageTypes.fps) {
         setCurrentFPS(e.data.fps);
       }
       console.log("Msg from worker:", e);
@@ -34,14 +35,14 @@ function Canvas() {
 
     workerRef.current.postMessage(
       {
-        type: "orb",
-        canvas: offscreenCanvas.current,
+        type: MessageTypes.update,
+        canvas: offscreenCanvasRef.current,
         maxOrbSize,
         orbColorRange,
         orbDensity,
         xySpeed,
       },
-      [offscreenCanvas.current]
+      [offscreenCanvasRef.current]
     );
     return () => {
       // workerRef.current?.terminate();
@@ -51,10 +52,10 @@ function Canvas() {
 
   useEffect(() => {
     workerRef.current?.postMessage({
-      type: "STOP",
+      type: MessageTypes.stop,
     });
     workerRef.current?.postMessage({
-      type: "orb",
+      type: MessageTypes.update,
       maxOrbSize,
       orbColorRange,
       orbDensity,
