@@ -85,7 +85,7 @@ export function updateOrb(
   // Wrap around edges of the canvas for infinite movement
   // since the z range affects the orb size, we'll use that when calculating
   // the threshold that determines whether the orb is inside or outside the bounds
-  const tolerance = Z_RANGE * 2;
+  const tolerance = Z_RANGE * (zDepth || 1);
   const min = -tolerance;
   const maxX = canvasWidth + tolerance;
   const maxY = canvasHeight + tolerance;
