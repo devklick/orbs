@@ -1,24 +1,16 @@
 import clsx from "clsx";
 import { IconSettings, IconSettingsFilled } from "@tabler/icons-react";
 
-import useSettings from "./store/useSettings";
+import useSettings, { defaults, SettingsState } from "./store/useSettings";
 import "./Settings.scss";
 
 function Settings() {
   const open = useSettings((s) => s.modalOpen);
   const setModalOpen = useSettings((s) => s.setModalOpen);
-  const setOrbDensity = useSettings((s) => s.setOrbDensityFactor);
-  const setMaxOrbSize = useSettings((s) => s.setMaxOrbSize);
-  const setOrbColorRange = useSettings((s) => s.setOrbColorRange);
-  const setSpeed = useSettings((s) => s.setXYSpeed);
-  const setZDepth = useSettings((s) => s.setZDepth);
-  const orbColorRange = useSettings((s) => s.orbColorRange);
-  const backgroundColor = useSettings((s) => s.backgroundColor);
+  const { h, s, l } = useSettings((s) => s.backgroundColor);
   const theme = useSettings((s) => s.uiColorTheme);
-  const setBackgroundColor = useSettings((s) => s.setBackgroundColor);
-  const defaults = useSettings((s) => s.defaults);
 
-  const modalColor = `hsl(${backgroundColor.h} ${backgroundColor.s} ${backgroundColor.l})`;
+  const modalColor = `hsl(${h} ${s} ${l})`;
 
   function onModalIconClicked() {
     setModalOpen(!open);
@@ -40,218 +32,194 @@ function Settings() {
       </div>
       {open && (
         <div className="settings__modal" style={{ background: modalColor }}>
-          <div className="settings__setting">
-            <label>Density</label>
-            <input
-              type="range"
-              min={defaults.orbDensityFactorRange.min}
-              max={defaults.orbDensityFactorRange.max}
-              step={0.1}
-              defaultValue={defaults.orbDensityFactor}
-              onChange={(e) => setOrbDensity(Number(e.target.value))}
-            />
-          </div>
-
-          <div className="settings__setting">
-            <label>Max Orb Size</label>
-            <input
-              type="range"
-              min={defaults.maxOrbSizeRange.min}
-              max={defaults.maxOrbSizeRange.max}
-              step={0.1}
-              defaultValue={defaults.maxOrbSize}
-              onChange={(e) => setMaxOrbSize(Number(e.target.value))}
-            />
-          </div>
-
-          <div className="settings__setting">
-            <label>Speed</label>
-            <input
-              type="range"
-              min={defaults.xySpeedRange.min}
-              max={defaults.xySpeedRange.max}
-              step={0.1}
-              defaultValue={defaults.xySpeed}
-              onChange={(e) => setSpeed(Number(e.target.value))}
-            />
-          </div>
-
-          <div className="settings__setting">
-            <label>Depth</label>
-            <input
-              type="range"
-              min={defaults.zDepthRange.min}
-              max={defaults.zDepthRange.max}
-              step={0.1}
-              defaultValue={defaults.zDepth}
-              onChange={(e) => setZDepth(Number(e.target.value))}
-            />
-          </div>
-
-          <div className="settings__group">
-            <label>Orb Color</label>
-            <div className="settings__group">
-              <label>Hue</label>
-              <div className="settings__setting">
-                <label>Min</label>
-                <input
-                  type="range"
-                  min={defaults.hslMinMax.h.min}
-                  max={defaults.hslMinMax.h.max}
-                  step={1}
-                  defaultValue={orbColorRange.h[0]}
-                  onChange={(e) =>
-                    setOrbColorRange({
-                      ...orbColorRange,
-                      h: [Number(e.target.value), orbColorRange.h[1]],
-                    })
-                  }
-                />
-              </div>
-              <div className="settings__setting">
-                <label>Max</label>
-                <input
-                  type="range"
-                  min={defaults.hslMinMax.h.min}
-                  max={defaults.hslMinMax.h.max}
-                  step={1}
-                  defaultValue={defaults.orbColorRange.h[1]}
-                  onChange={(e) =>
-                    setOrbColorRange({
-                      ...orbColorRange,
-                      h: [orbColorRange.h[0], Number(e.target.value)],
-                    })
-                  }
-                />
-              </div>
-            </div>
-
-            <div className="settings__group">
-              <label>Saturation</label>
-              <div className="settings__setting">
-                <label>Min</label>
-                <input
-                  type="range"
-                  min={defaults.hslMinMax.s.min}
-                  max={defaults.hslMinMax.s.max}
-                  step={1}
-                  defaultValue={defaults.orbColorRange.s[0]}
-                  onChange={(e) =>
-                    setOrbColorRange({
-                      ...orbColorRange,
-                      s: [Number(e.target.value), orbColorRange.s[1]],
-                    })
-                  }
-                />
-              </div>
-              <div className="settings__setting">
-                <label>Max</label>
-                <input
-                  type="range"
-                  min={defaults.hslMinMax.s.min}
-                  max={defaults.hslMinMax.s.max}
-                  step={1}
-                  defaultValue={defaults.orbColorRange.s[1]}
-                  onChange={(e) =>
-                    setOrbColorRange({
-                      ...orbColorRange,
-                      s: [orbColorRange.s[0], Number(e.target.value)],
-                    })
-                  }
-                />
-              </div>
-            </div>
-
-            <div className="settings__group">
-              <label>Lightness</label>
-              <div className="settings__setting">
-                <label>Min</label>
-                <input
-                  type="range"
-                  min={defaults.hslMinMax.l.min}
-                  max={defaults.hslMinMax.l.max}
-                  step={1}
-                  defaultValue={defaults.orbColorRange.l[0]}
-                  onChange={(e) =>
-                    setOrbColorRange({
-                      ...orbColorRange,
-                      l: [Number(e.target.value), orbColorRange.l[1]],
-                    })
-                  }
-                />
-              </div>
-              <div className="settings__setting">
-                <label>Max</label>
-                <input
-                  type="range"
-                  min={defaults.hslMinMax.l.min}
-                  max={defaults.hslMinMax.l.max}
-                  step={1}
-                  defaultValue={defaults.orbColorRange.l[1]}
-                  onChange={(e) =>
-                    setOrbColorRange({
-                      ...orbColorRange,
-                      l: [orbColorRange.l[0], Number(e.target.value)],
-                    })
-                  }
-                />
-              </div>
-            </div>
-          </div>
-
-          <div className="settings__group">
-            <label>Background color</label>
-            <div className="settings__setting">
-              <label>Hue</label>
-              <input
-                type="range"
-                min={defaults.hslMinMax.h.min}
-                max={defaults.hslMinMax.h.max}
-                defaultValue={backgroundColor.h}
-                step={1}
-                onChange={(e) =>
-                  setBackgroundColor({
-                    ...backgroundColor,
-                    h: Number(e.target.value),
-                  })
-                }
-              />
-            </div>
-            <div className="settings__setting">
-              <label>Saturation</label>
-              <input
-                type="range"
-                min={defaults.hslMinMax.s.min}
-                max={defaults.hslMinMax.s.max}
-                defaultValue={backgroundColor.s}
-                step={1}
-                onChange={(e) =>
-                  setBackgroundColor({
-                    ...backgroundColor,
-                    s: Number(e.target.value),
-                  })
-                }
-              />
-            </div>
-            <div className="settings__setting">
-              <label>Lightness</label>
-              <input
-                type="range"
-                min={defaults.hslMinMax.l.min}
-                max={defaults.hslMinMax.l.max}
-                defaultValue={backgroundColor.l}
-                step={1}
-                onChange={(e) =>
-                  setBackgroundColor({
-                    ...backgroundColor,
-                    l: Number(e.target.value),
-                  })
-                }
-              />
-            </div>
-          </div>
+          <MainSettings />
+          <OrbColorSettings />
+          <BackgroundColorSettings />
         </div>
       )}
+    </div>
+  );
+}
+
+function MainSettings() {
+  const setMaxOrbSize = useSettings((s) => s.setMaxOrbSize);
+  const setSpeed = useSettings((s) => s.setXYSpeed);
+  const setZDepth = useSettings((s) => s.setZDepth);
+  const setDensity = useSettings((s) => s.setOrbDensityFactor);
+  return (
+    <>
+      <Slider
+        label="Density"
+        min={defaults.orbDensityFactorRange.min}
+        max={defaults.orbDensityFactorRange.max}
+        step={0.1}
+        valueSelector={(s) => s.orbDensityFactor}
+        onChange={setDensity}
+      />
+
+      <Slider
+        label="Max Orb Size"
+        min={defaults.maxOrbSizeRange.min}
+        max={defaults.maxOrbSizeRange.max}
+        step={0.1}
+        valueSelector={(s) => s.maxOrbSize}
+        onChange={setMaxOrbSize}
+      />
+
+      <Slider
+        label="Speed"
+        min={defaults.xySpeedRange.min}
+        max={defaults.xySpeedRange.max}
+        step={0.1}
+        valueSelector={(s) => s.xySpeed}
+        onChange={setSpeed}
+      />
+
+      <Slider
+        label="Depth"
+        min={defaults.zDepthRange.min}
+        max={defaults.zDepthRange.max}
+        step={0.1}
+        valueSelector={(s) => s.zDepth}
+        onChange={setZDepth}
+      />
+    </>
+  );
+}
+
+function OrbColorSettings() {
+  const setOrbColorRange = useSettings((s) => s.setOrbColorRange);
+
+  return (
+    <div className="settings__group">
+      <label>Orb Color</label>
+      <div className="settings__group">
+        <label>Hue</label>
+        <Slider
+          label="Min"
+          min={defaults.hslMinMax.h.min}
+          max={defaults.hslMinMax.h.max}
+          valueSelector={(s) => s.orbColorRange.h.min}
+          onChange={(value) => setOrbColorRange({ h: { min: value } })}
+          step={1}
+        />
+        <Slider
+          label="Max"
+          min={defaults.hslMinMax.h.min}
+          max={defaults.hslMinMax.h.max}
+          valueSelector={(s) => s.orbColorRange.h.max}
+          onChange={(value) => setOrbColorRange({ h: { max: value } })}
+          step={1}
+        />
+      </div>
+      <div className="settings__group">
+        <label>Saturation</label>
+        <Slider
+          label="Min"
+          min={defaults.hslMinMax.s.min}
+          max={defaults.hslMinMax.s.max}
+          valueSelector={(s) => s.orbColorRange.s.min}
+          onChange={(value) => setOrbColorRange({ s: { min: value } })}
+          step={1}
+        />
+        <Slider
+          label="Max"
+          min={defaults.hslMinMax.s.min}
+          max={defaults.hslMinMax.s.max}
+          valueSelector={(s) => s.orbColorRange.s.max}
+          onChange={(value) => setOrbColorRange({ s: { max: value } })}
+          step={1}
+        />
+      </div>
+      <div className="settings__group">
+        <label>Lightness</label>
+        <Slider
+          label="Min"
+          min={defaults.hslMinMax.l.min}
+          max={defaults.hslMinMax.l.max}
+          valueSelector={(s) => s.orbColorRange.l.min}
+          onChange={(value) => setOrbColorRange({ l: { min: value } })}
+          step={1}
+        />
+        <Slider
+          label="Max"
+          min={defaults.hslMinMax.l.min}
+          max={defaults.hslMinMax.l.max}
+          valueSelector={(s) => s.orbColorRange.l.max}
+          onChange={(value) => setOrbColorRange({ l: { max: value } })}
+          step={1}
+        />
+      </div>
+    </div>
+  );
+}
+
+function BackgroundColorSettings() {
+  const setBackgroundColor = useSettings((s) => s.setBackgroundColor);
+  return (
+    <div className="settings__group">
+      <label>Background color</label>
+      <Slider
+        label="Hue"
+        min={defaults.hslMinMax.h.min}
+        max={defaults.hslMinMax.h.max}
+        step={1}
+        valueSelector={(s) => s.backgroundColor.h}
+        onChange={(h) => setBackgroundColor({ h })}
+      />
+      <Slider
+        label="Saturation"
+        min={defaults.hslMinMax.s.min}
+        max={defaults.hslMinMax.s.max}
+        step={1}
+        valueSelector={(s) => s.backgroundColor.s}
+        onChange={(s) => setBackgroundColor({ s })}
+      />
+      <Slider
+        label="Lightness"
+        min={defaults.hslMinMax.l.min}
+        max={defaults.hslMinMax.l.max}
+        step={1}
+        valueSelector={(s) => s.backgroundColor.l}
+        onChange={(l) => setBackgroundColor({ l })}
+      />
+    </div>
+  );
+}
+
+interface SliderProps {
+  label: string;
+  min: number;
+  max: number;
+  step: number;
+  valueSelector: (state: SettingsState) => number;
+  onChange: (value: number) => void;
+}
+
+function Slider({
+  label,
+  max,
+  min,
+  valueSelector,
+  onChange,
+  step,
+}: SliderProps) {
+  const value = useSettings(valueSelector);
+
+  return (
+    <div className="settings__setting">
+      <label>{label}</label>
+      <input
+        type="range"
+        min={min}
+        max={max}
+        value={value}
+        step={step}
+        onChange={(e) => {
+          console.log("value changed to", e.currentTarget.value);
+          onChange(Number(e.currentTarget.value));
+        }}
+      />
     </div>
   );
 }

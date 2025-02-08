@@ -16,6 +16,8 @@ export function useOffscreenCanvas() {
     }
   }, [canvasRef, offscreenCanvasRef]);
 
+  // TODO: Look into properly resizing the offscreen canvas.
+  // Think this means destroying and recreating it with the new sizes :(
   // useEffect(() => {
   //   function resize() {
   //     console.log("useFullScreenCanvas.resize");

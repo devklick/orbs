@@ -2,15 +2,17 @@ import { create } from "zustand";
 
 import {
   clone,
+  DeepPartial,
   DeepReadonly,
   HSLColor,
   HSLColorRange,
+  HSLKey,
   NumberRange,
 } from "../../../types";
 
 type ColorTheme = "light" | "dark";
 
-interface SettingsStateProperties {
+export interface SettingsStateProperties {
   /**
    * Whether or not the settings modal is currently open
    *
@@ -62,7 +64,7 @@ interface SettingsStateProperties {
   uiColorTheme: ColorTheme;
 }
 
-type Defaults = DeepReadonly<
+export type Defaults = DeepReadonly<
   SettingsStateProperties & {
     hslMinMax: { h: NumberRange; s: NumberRange; l: NumberRange };
     orbDensityFactorRange: NumberRange;
@@ -72,9 +74,13 @@ type Defaults = DeepReadonly<
   }
 >;
 
-const defaults: Defaults = {
+export const defaults: Defaults = {
   modalOpen: false,
-  orbColorRange: { h: [140, 220], s: [20, 40], l: [40, 80] },
+  orbColorRange: {
+    h: { min: 140, max: 220 },
+    s: { min: 20, max: 40 },
+    l: { min: 40, max: 80 },
+  },
   hslMinMax: {
     h: { min: 0, max: 360 },
     s: { min: 0, max: 100 },
@@ -92,92 +98,108 @@ const defaults: Defaults = {
   uiColorTheme: "dark",
 };
 
-interface SettingsState extends SettingsStateProperties {
-  defaults: Defaults;
+export interface SettingsState extends SettingsStateProperties {
   currentFPS: Readonly<number>;
   setModalOpen(modalOpen: boolean): void;
-  setOrbColorRange(orbColorRange: HSLColorRange): void;
+  setOrbColorRange(orbColorRange: DeepPartial<HSLColorRange>): void;
   setOrbDensityFactor(orbDensityFactor: number): void;
   setMaxOrbSize(maxOrbSize: number): void;
   setXYSpeed(speed: number): void;
   setCurrentFPS(currentFPS: number): void;
-  setBackgroundColor(backgroundColor: HSLColor): void;
+  setBackgroundColor(backgroundColor: Partial<HSLColor>): void;
   setUIColorTheme(uiColorTheme: ColorTheme): void;
   setZDepth(zDepth: number): void;
 }
 
-const useSettings = create<SettingsState>((set, get) => ({
-  defaults: defaults,
+export const useSettings = create<SettingsState>()((set, get) => ({
   backgroundColor: defaults.backgroundColor,
   currentFPS: 0,
   modalOpen: defaults.modalOpen,
-  orbColorRange: clone(defaults.orbColorRange, { writable: true }),
+  orbColorRange: clone(defaults.orbColorRange),
   orbDensityFactor: defaults.orbDensityFactor,
   maxOrbSize: defaults.maxOrbSize,
   xySpeed: defaults.xySpeed,
   uiColorTheme: defaults.uiColorTheme,
   zDepth: defaults.zDepth,
   setModalOpen(modalOpen) {
+    console.log("setModalOpen called");
     set({ modalOpen });
   },
   setMaxOrbSize(maxOrbSize) {
+    console.log("setMaxOrbSize called");
     set({ maxOrbSize });
   },
   setOrbColorRange(orbColorRange) {
-    const defaults = get().defaults.hslMinMax;
-    const hValid =
-      orbColorRange.h[0] >= defaults.h.min &&
-      orbColorRange.h[1] <= defaults.h.max &&
-      orbColorRange.h[0] <= orbColorRange.h[1];
+    console.log("setOrbColorRange called");
+    const _defaults = defaults.hslMinMax;
+    const updates = clone(get().orbColorRange);
 
-    const sValid =
-      orbColorRange.s[0] >= defaults.s.min &&
-      orbColorRange.s[1] <= defaults.s.max &&
-      orbColorRange.s[0] <= orbColorRange.s[1];
-
-    const lValid =
-      orbColorRange.l[0] >= defaults.l.min &&
-      orbColorRange.l[1] <= defaults.l.max &&
-      orbColorRange.l[0] <= orbColorRange.l[1];
-
-    if (hValid && sValid && lValid) {
-      set({ orbColorRange });
+    for (const key of Object.keys(orbColorRange) as Array<HSLKey>) {
+      // if min present and valid, apply it
+      if (
+        orbColorRange[key]?.min !== undefined &&
+        orbColorRange[key].min >= _defaults[key].min &&
+        orbColorRange[key].min <= (orbColorRange[key].max ?? updates[key].max)
+      ) {
+        updates[key].min = orbColorRange[key].min;
+      }
+      // if max present and valid, apply it
+      if (
+        orbColorRange[key]?.max !== undefined &&
+        orbColorRange[key].max <= _defaults[key].max &&
+        orbColorRange[key].max >= (orbColorRange[key].min ?? updates[key].min)
+      ) {
+        updates[key].max = orbColorRange[key].max;
+      }
     }
+
+    set({ orbColorRange: updates });
   },
   setOrbDensityFactor(orbDensityFactor) {
+    console.log("setOrbDensityFactor called");
     set({ orbDensityFactor });
   },
   setXYSpeed(xySpeed) {
+    console.log("setXYSpeed called");
     set({ xySpeed });
   },
   setCurrentFPS(currentFPS) {
     set({ currentFPS });
   },
   setBackgroundColor(backgroundColor) {
-    const defaults = get().defaults.hslMinMax;
-    const hValid =
-      backgroundColor.h >= defaults.h.min &&
-      backgroundColor.h <= defaults.h.max;
+    console.log("setBackgroundColor called");
+    const _defaults = defaults.hslMinMax;
+    const updated = clone(get().backgroundColor);
 
-    const sValid =
-      backgroundColor.s >= defaults.s.min &&
-      backgroundColor.s <= defaults.s.max;
+    if (backgroundColor.h !== undefined) {
+      updated.h = backgroundColor.h;
+    }
+    if (backgroundColor.s !== undefined) {
+      updated.s = backgroundColor.s;
+    }
+    if (backgroundColor.l !== undefined) {
+      updated.l = backgroundColor.l;
+    }
 
-    const lValid =
-      backgroundColor.l >= defaults.l.min &&
-      backgroundColor.l <= defaults.s.max;
+    const hValid = updated.h >= _defaults.h.min && updated.h <= _defaults.h.max;
+
+    const sValid = updated.s >= _defaults.s.min && updated.s <= _defaults.s.max;
+
+    const lValid = updated.l >= _defaults.l.min && updated.l <= _defaults.s.max;
 
     if (hValid && sValid && lValid) {
-      set({ backgroundColor });
+      set({ backgroundColor: updated });
     }
-    const uiColorTheme: ColorTheme = backgroundColor.l > 60 ? "light" : "dark";
+    const uiColorTheme: ColorTheme = updated.l > 60 ? "light" : "dark";
     set({ uiColorTheme });
   },
   setUIColorTheme(uiColorTheme) {
+    console.log("setUIColorTheme called");
     set({ uiColorTheme });
   },
   setZDepth(zDepth) {
-    const { min, max } = get().defaults.zDepthRange;
+    console.log("setZDepth called");
+    const { min, max } = defaults.zDepthRange;
     if (zDepth >= min && zDepth <= max) {
       set({ zDepth });
     }

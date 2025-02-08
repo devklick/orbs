@@ -76,14 +76,10 @@ function int(
 /**
  * Generate a random color presented as an HSL string
  */
-function hsl({
-  h: [hMin, hMax],
-  s: [sMin, sMax],
-  l: [lMin, lMax],
-}: HSLColorRange) {
-  const h = float(hMin, hMax);
-  const s = float(sMin, sMax);
-  const l = float(lMin, lMax);
+function hsl({ h: _h, s: _s, l: _l }: HSLColorRange) {
+  const h = float(_h.min, _h.max);
+  const s = float(_s.min, _s.max);
+  const l = float(_l.min, _l.max);
   return `hsl(${h}, ${s}%, ${l}%)`;
 }
 
