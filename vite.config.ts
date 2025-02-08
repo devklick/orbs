@@ -4,6 +4,7 @@ import react from "@vitejs/plugin-react";
 // https://vite.dev/config/
 export default defineConfig({
   plugins: [react()],
+  base: "https://devklick.github.io/orbs/",
   resolve: {
     alias: {
       // See https://github.com/tabler/tabler-icons/issues/1233#issuecomment-2428245119
