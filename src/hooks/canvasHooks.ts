@@ -5,7 +5,9 @@ export function useCanvas() {
   return [canvasRef] as const;
 }
 
-export function useOffscreenCanvas() {
+export function useOffscreenCanvas(
+  onResize: (width: number, height: number) => void
+) {
   const [canvasRef] = useCanvas();
   const offscreenCanvasRef = useRef<OffscreenCanvas | null>(null);
 
@@ -18,17 +20,14 @@ export function useOffscreenCanvas() {
 
   // TODO: Look into properly resizing the offscreen canvas.
   // Think this means destroying and recreating it with the new sizes :(
-  // useEffect(() => {
-  //   function resize() {
-  //     console.log("useFullScreenCanvas.resize");
-  //     if (!offscreenCanvasRef.current) return;
-  //     offscreenCanvasRef.current.width = window.innerWidth;
-  //     offscreenCanvasRef.current.height = window.innerHeight;
-  //   }
-  //   resize();
-  //   window.addEventListener("resize", resize);
-  //   return () => window.removeEventListener("resize", resize);
-  // }, [offscreenCanvasRef]);
+  useEffect(() => {
+    function resize() {
+      onResize(window.innerWidth, window.innerHeight);
+    }
+    resize();
+    window.addEventListener("resize", resize);
+    return () => window.removeEventListener("resize", resize);
+  }, [onResize]);
 
   return [canvasRef, offscreenCanvasRef] as const;
 }

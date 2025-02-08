@@ -215,10 +215,7 @@ function Slider({
         max={max}
         value={value}
         step={step}
-        onChange={(e) => {
-          console.log("value changed to", e.currentTarget.value);
-          onChange(Number(e.currentTarget.value));
-        }}
+        onChange={(e) => onChange(Number(e.currentTarget.value))}
       />
     </div>
   );

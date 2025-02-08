@@ -35,6 +35,7 @@ export namespace WorkerReceivedMessage {
     setup: "SETUP",
     pause: "PAUSE",
     resume: "RESUME",
+    resize: "RESIZE",
   } as const;
 
   export interface Setup {
@@ -62,7 +63,13 @@ export namespace WorkerReceivedMessage {
     type: typeof Types.resume;
   }
 
-  export type MessageData = Setup | Update | Stop | Pause | Resume;
+  export interface Resize extends Omit<Update, "type"> {
+    type: typeof Types.resize;
+    width: number;
+    height: number;
+  }
+
+  export type MessageData = Setup | Update | Stop | Pause | Resume | Resize;
 }
 
 /**
@@ -118,6 +125,8 @@ function handleMessage(data: WorkerReceivedMessage.MessageData) {
   switch (data.type) {
     case "SETUP":
       return handleSetupMessage(data);
+    case "RESIZE":
+      return handleResizeMessage(data);
     case "STOP":
       return handleStopMessage(data);
     case "UPDATE":
@@ -140,6 +149,15 @@ function handleMessage(data: WorkerReceivedMessage.MessageData) {
 function handleSetupMessage(data: WorkerReceivedMessage.Setup) {
   if (data.canvas && !canvas) {
     canvas = data.canvas;
+  }
+}
+
+function handleResizeMessage(data: WorkerReceivedMessage.Resize) {
+  if (canvas) {
+    if (animationFrameId) cancelAnimationFrame(animationFrameId);
+    canvas.width = data.width;
+    canvas.height = data.height;
+    handleUpdateMessage({ ...data, type: "UPDATE" });
   }
 }
 

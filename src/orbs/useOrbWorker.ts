@@ -16,7 +16,7 @@ export default function useOrbWorker(): UseOrbWorkerReturn {
   const orbDensity = useSettings((s) => s.orbDensityFactor);
   const xySpeed = useSettings((s) => s.xySpeed);
   const zDepth = useSettings((s) => s.zDepth);
-  const [canvasRef, offscreenCanvasRef] = useOffscreenCanvas();
+  const [canvasRef, offscreenCanvasRef] = useOffscreenCanvas(sendResizeMessage);
 
   /**
    * Function to initialize the worker.
@@ -60,7 +60,7 @@ export default function useOrbWorker(): UseOrbWorkerReturn {
   const sendStopMessage = useCallback(() => {
     workerRef.current.postMessage({
       type: WorkerReceivedMessage.Types.stop,
-    });
+    } satisfies WorkerReceivedMessage.Stop);
   }, [workerRef]);
 
   /**
@@ -72,8 +72,7 @@ export default function useOrbWorker(): UseOrbWorkerReturn {
       workerRef.current.postMessage({
         type: WorkerReceivedMessage.Types.update,
         ...data,
-        pause: false,
-      });
+      } satisfies WorkerReceivedMessage.Update);
     },
     [workerRef]
   );
@@ -81,7 +80,7 @@ export default function useOrbWorker(): UseOrbWorkerReturn {
   const sendPausedMessage = useCallback(() => {
     workerRef.current.postMessage({
       type: WorkerReceivedMessage.Types.pause,
-    });
+    } satisfies WorkerReceivedMessage.Pause);
   }, [workerRef]);
 
   const sendResumeMessage = useCallback(() => {
@@ -91,8 +90,22 @@ export default function useOrbWorker(): UseOrbWorkerReturn {
       orbColorRange,
       orbDensity,
       xySpeed,
-    });
-  }, [maxOrbSize, orbColorRange, orbDensity, workerRef, xySpeed]);
+      zDepth,
+    } satisfies WorkerReceivedMessage.Resume);
+  }, [maxOrbSize, orbColorRange, orbDensity, workerRef, xySpeed, zDepth]);
+
+  function sendResizeMessage(width: number, height: number) {
+    workerRef.current.postMessage({
+      type: WorkerReceivedMessage.Types.resize,
+      height,
+      width,
+      maxOrbSize,
+      orbColorRange,
+      orbDensity,
+      xySpeed,
+      zDepth,
+    } satisfies WorkerReceivedMessage.Resize);
+  }
 
   const handleVisibilityChanged = useCallback(() => {
     if (document.hidden) sendPausedMessage();

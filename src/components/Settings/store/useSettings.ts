@@ -107,7 +107,6 @@ export interface SettingsState extends SettingsStateProperties {
   setXYSpeed(speed: number): void;
   setCurrentFPS(currentFPS: number): void;
   setBackgroundColor(backgroundColor: Partial<HSLColor>): void;
-  setUIColorTheme(uiColorTheme: ColorTheme): void;
   setZDepth(zDepth: number): void;
 }
 
@@ -122,15 +121,12 @@ export const useSettings = create<SettingsState>()((set, get) => ({
   uiColorTheme: defaults.uiColorTheme,
   zDepth: defaults.zDepth,
   setModalOpen(modalOpen) {
-    console.log("setModalOpen called");
     set({ modalOpen });
   },
   setMaxOrbSize(maxOrbSize) {
-    console.log("setMaxOrbSize called");
     set({ maxOrbSize });
   },
   setOrbColorRange(orbColorRange) {
-    console.log("setOrbColorRange called");
     const _defaults = defaults.hslMinMax;
     const updates = clone(get().orbColorRange);
 
@@ -156,18 +152,15 @@ export const useSettings = create<SettingsState>()((set, get) => ({
     set({ orbColorRange: updates });
   },
   setOrbDensityFactor(orbDensityFactor) {
-    console.log("setOrbDensityFactor called");
     set({ orbDensityFactor });
   },
   setXYSpeed(xySpeed) {
-    console.log("setXYSpeed called");
     set({ xySpeed });
   },
   setCurrentFPS(currentFPS) {
     set({ currentFPS });
   },
   setBackgroundColor(backgroundColor) {
-    console.log("setBackgroundColor called");
     const _defaults = defaults.hslMinMax;
     const updated = clone(get().backgroundColor);
 
@@ -193,12 +186,7 @@ export const useSettings = create<SettingsState>()((set, get) => ({
     const uiColorTheme: ColorTheme = updated.l > 60 ? "light" : "dark";
     set({ uiColorTheme });
   },
-  setUIColorTheme(uiColorTheme) {
-    console.log("setUIColorTheme called");
-    set({ uiColorTheme });
-  },
   setZDepth(zDepth) {
-    console.log("setZDepth called");
     const { min, max } = defaults.zDepthRange;
     if (zDepth >= min && zDepth <= max) {
       set({ zDepth });
