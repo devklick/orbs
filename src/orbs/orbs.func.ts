@@ -15,7 +15,7 @@ export function createOrb(
   canvasHeight: number,
   orbColorRange: HSLColorRange,
   maxOrbSize: number,
-  zDepth: number
+  zDepth: number,
 ): Orb {
   const orb: Orb = {
     position: {
@@ -50,7 +50,7 @@ export function updateOrb(
   xySpeed: number,
   canvasWidth: number,
   canvasHeight: number,
-  zDepth: number
+  zDepth: number,
 ) {
   const speedFactor = delta / FPMS; // Normalize to 60 FPS
 
@@ -98,11 +98,11 @@ export function updateOrb(
 
 export function drawOrb(
   orb: Orb,
-  ctx: CanvasRenderingContext2D | OffscreenCanvasRenderingContext2D
+  ctx: CanvasRenderingContext2D | OffscreenCanvasRenderingContext2D,
 ) {
   // blur as z moves further from 0.
   // as z gets larger, orb moving away from pov, blur less
-  // as z gets larger, orb moving towards pob, blur more
+  // as z gets smaller, orb moving towards pov, blur more
   const blurAmount =
     orb.position.z > 0
       ? Math.abs(orb.position.z) * 1.5
@@ -136,6 +136,6 @@ export function createOrbs({
   const area = width * height;
   const orbCount = Math.max(10, area / 20000) * orbDensity;
   return Array.from({ length: orbCount }, () =>
-    createOrb(width, height, orbColorRange, maxOrbSize, zDepth)
+    createOrb(width, height, orbColorRange, maxOrbSize, zDepth),
   );
 }

@@ -73,9 +73,9 @@ export namespace WorkerReceivedMessage {
 }
 
 /**
- * The number of seconds between the FPS counter updates.
+ * The number of milliseconds between the FPS counter updates.
  */
-const FPS_UPDATE_INTERVAL = 500;
+const FPS_UPDATE_INTERVAL_MS = 500;
 
 interface DrawParams {
   xySpeed: number;
@@ -192,7 +192,7 @@ function handleResumeMessage(data: WorkerReceivedMessage.Resume) {
   prevFrameTime = performance.now();
 
   animationFrameId = requestAnimationFrame((time) =>
-    draw(time, { xySpeed: data.xySpeed, ctx, zDepth: data.zDepth })
+    draw(time, { xySpeed: data.xySpeed, ctx, zDepth: data.zDepth }),
   );
 }
 
@@ -223,7 +223,7 @@ function handleUpdateMessage({
   prevFrameTime = performance.now();
 
   animationFrameId = requestAnimationFrame((time) =>
-    draw(time, { xySpeed, ctx, zDepth })
+    draw(time, { xySpeed, ctx, zDepth }),
   );
 }
 
@@ -243,7 +243,7 @@ function draw(time: number, { xySpeed, ctx, zDepth }: DrawParams) {
       xySpeed,
       canvas.width,
       canvas.height,
-      zDepth
+      zDepth,
     );
     drawOrb(orb, ctx);
     ctx.fill();
@@ -251,7 +251,7 @@ function draw(time: number, { xySpeed, ctx, zDepth }: DrawParams) {
 
   if (paused) return;
   animationFrameId = requestAnimationFrame((time) =>
-    draw(time, { ctx, xySpeed, zDepth })
+    draw(time, { ctx, xySpeed, zDepth }),
   );
 }
 
@@ -267,7 +267,7 @@ function calcFrameTimes(time: number) {
 
   prevFrameTime = time;
 
-  if (time - lastFpsUpdate > FPS_UPDATE_INTERVAL) {
+  if (time - lastFpsUpdate > FPS_UPDATE_INTERVAL_MS) {
     const fps = unsentFps.reduce((sum, num) => sum + num, 0) / unsentFps.length;
     unsentFps = [];
     self.postMessage({ type: WorkerSentMessage.Types.fps, fps });

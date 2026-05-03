@@ -3,9 +3,9 @@ import clsx from "clsx";
 import Settings from "./components/Settings";
 import FPS from "./components/FpsCounter";
 import { useSettings } from "./components/Settings";
+import Canvas from "./components/Canvas";
 
 import "./App.scss";
-import Canvas from "./components/Canvas";
 
 function App() {
   const theme = useSettings((s) => s.uiColorTheme);
