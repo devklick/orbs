@@ -6,7 +6,7 @@ import OrbWorker from "../workers/orbWorker.ts?worker";
 import { useSettings } from "../components/Settings";
 
 interface UseOrbWorkerReturn {
-  canvasRef: React.RefObject<HTMLCanvasElement>;
+  canvasRef: React.RefObject<HTMLCanvasElement | null>;
 }
 
 export default function useOrbWorker(): UseOrbWorkerReturn {
@@ -41,7 +41,7 @@ export default function useOrbWorker(): UseOrbWorkerReturn {
         setCurrentFPS(event.data.fps);
       }
     },
-    [setCurrentFPS]
+    [setCurrentFPS],
   );
 
   /**
@@ -50,7 +50,7 @@ export default function useOrbWorker(): UseOrbWorkerReturn {
   const [workerRef] = useOffscreenWorker(
     OrbWorker,
     handleWorkerMessage,
-    sendSetupMessage
+    sendSetupMessage,
   );
 
   /**
@@ -74,7 +74,7 @@ export default function useOrbWorker(): UseOrbWorkerReturn {
         ...data,
       } satisfies WorkerReceivedMessage.Update);
     },
-    [workerRef]
+    [workerRef],
   );
 
   const sendPausedMessage = useCallback(() => {
